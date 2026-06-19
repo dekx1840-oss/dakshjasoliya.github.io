@@ -1,0 +1,17 @@
+{% extends 'constructionapp/admin/base.html' %}
+{% block content %}
+<div class="page-header"><h1 class="page-title">Add Client</h1><a href="{% url 'admin_client_list' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a></div>
+<div class="card p-4" style="max-width:600px">
+  <div class="alert alert-info py-2 small"><i class="bi bi-info-circle me-2"></i>This will create a login account for the client to view their projects.</div>
+  <form method="post">{% csrf_token %}
+    <div class="mb-3"><label class="form-label fw-semibold">Full Name *</label><input name="name" class="form-control" required></div>
+    <div class="mb-3"><label class="form-label fw-semibold">Phone *</label><input name="phone" class="form-control" required></div>
+    <div class="mb-3"><label class="form-label fw-semibold">Email</label><input name="email" type="email" class="form-control"></div>
+    <div class="mb-3"><label class="form-label fw-semibold">Address</label><textarea name="address" class="form-control" rows="2"></textarea></div>
+    <hr><h6 class="fw-bold text-muted">LOGIN ACCOUNT</h6>
+    <div class="mb-3"><label class="form-label fw-semibold">Username *</label><input name="username" class="form-control" placeholder="Client login username" required></div>
+    <div class="mb-4"><label class="form-label fw-semibold">Password *</label><input name="password" type="password" class="form-control" placeholder="Set login password" required></div>
+    <button class="btn btn-warning w-100 py-2">Save Client & Create Account</button>
+  </form>
+</div>
+{% endblock %}

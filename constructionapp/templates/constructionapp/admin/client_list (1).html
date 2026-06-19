@@ -1,0 +1,34 @@
+{% extends 'constructionapp/admin/base.html' %}
+{% block content %}
+<div class="page-header"><h1 class="page-title">👤 Clients</h1><a href="{% url 'admin_client_add' %}" class="btn btn-warning"><i class="bi bi-plus-lg me-1"></i>Add Client</a></div>
+<div class="card"><div class="card-body p-0">
+<table class="table table-hover mb-0">
+  <thead class="table-light"><tr><th>#</th><th>Name</th><th>Phone</th><th>Email</th><th>Username</th><th>Address</th><th>Action</th></tr></thead>
+  <tbody>
+    {% if raw_results %}
+      {% for c in clients %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td class="fw-semibold">{{ c.name }}</td>
+        <td>{{ c.phone }}</td>
+        <td>{{ c.email|default:"-" }}</td>
+        <td><span class="badge bg-warning text-dark">RAW</span></td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      {% empty %}<tr><td colspan="7" class="text-center text-muted py-4">No results</td></tr>
+      {% endfor %}
+    {% else %}
+    {% for c in clients %}
+    <tr>
+      <td>{{ forloop.counter }}</td><td class="fw-semibold">{{ c.name }}</td><td>{{ c.phone }}</td><td>{{ c.email|default:"-" }}</td>
+      <td>{% if c.user %}<span class="badge bg-success">{{ c.user.username }}</span>{% else %}-{% endif %}</td>
+      <td>{{ c.address }}</td>
+      <td><a href="{% url 'admin_client_delete' c.pk %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete?')"><i class="bi bi-trash"></i></a></td>
+    </tr>
+    {% empty %}<tr><td colspan="7" class="text-center text-muted py-4">No clients yet</td></tr>{% endfor %}
+    {% endif %}
+  </tbody>
+</table>
+</div></div>
+{% endblock %}

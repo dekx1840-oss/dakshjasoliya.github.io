@@ -1,0 +1,28 @@
+{% extends 'constructionapp/base.html' %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">{{ action }} Client</h1>
+  <a href="{% url 'client_list' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+</div>
+<div class="card p-4" style="max-width:600px">
+  <form method="post">{% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Full Name *</label>
+      <input name="name" class="form-control" value="{{ client.name|default:'' }}" placeholder="e.g. Ramesh Patel" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Phone Number *</label>
+      <input name="phone" class="form-control" value="{{ client.phone|default:'' }}" placeholder="e.g. 9876543210" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Email</label>
+      <input name="email" type="email" class="form-control" value="{{ client.email|default:'' }}" placeholder="email@example.com">
+    </div>
+    <div class="mb-4">
+      <label class="form-label fw-semibold">Address *</label>
+      <textarea name="address" class="form-control" rows="3" placeholder="Full address" required>{{ client.address|default:'' }}</textarea>
+    </div>
+    <button class="btn btn-warning w-100 py-2"><i class="bi bi-check-lg me-2"></i>Save Client</button>
+  </form>
+</div>
+{% endblock %}

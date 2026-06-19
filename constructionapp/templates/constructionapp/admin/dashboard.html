@@ -1,0 +1,132 @@
+{% extends 'constructionapp/admin/base.html' %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">🏗️ Dashboard</h1>
+  <a href="{% url 'admin_project_add' %}" class="btn btn-warning px-4"><i class="bi bi-plus-lg me-2"></i>New Project</a>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-5">
+  <div class="col-md-2 col-sm-4">
+    <div class="stat-card">
+      <div class="stat-icon mb-3" style="background: rgba(15, 23, 42, 0.05); color: var(--luxury-primary);"><i class="bi bi-building"></i></div>
+      <div class="fs-2 fw-bold" style="color: var(--luxury-primary); font-family: 'Outfit', sans-serif;">{{ total_projects }}</div>
+      <div class="text-muted small" style="font-size: 11px; letter-spacing: 0.5px;">Total Projects</div>
+    </div>
+  </div>
+  <div class="col-md-2 col-sm-4">
+    <div class="stat-card">
+      <div class="stat-icon mb-3" style="background: rgba(40, 167, 69, 0.1); color: #28a745;"><i class="bi bi-check-circle"></i></div>
+      <div class="fs-2 fw-bold" style="color: #28a745; font-family: 'Outfit', sans-serif;">{{ ongoing }}</div>
+      <div class="text-muted small" style="font-size: 11px; letter-spacing: 0.5px;">Ongoing</div>
+    </div>
+  </div>
+  <div class="col-md-2 col-sm-4">
+    <div class="stat-card">
+      <div class="stat-icon mb-3" style="background: rgba(23, 162, 184, 0.1); color: #17a2b8;"><i class="bi bi-flag"></i></div>
+      <div class="fs-2 fw-bold" style="color: #17a2b8; font-family: 'Outfit', sans-serif;">{{ completed }}</div>
+      <div class="text-muted small" style="font-size: 11px; letter-spacing: 0.5px;">Completed</div>
+    </div>
+  </div>
+  <div class="col-md-2 col-sm-4">
+    <div class="stat-card">
+      <div class="stat-icon mb-3" style="background: rgba(197, 168, 128, 0.15); color: var(--luxury-gold-dark);"><i class="bi bi-people-fill"></i></div>
+      <div class="fs-2 fw-bold" style="color: var(--luxury-gold-dark); font-family: 'Outfit', sans-serif;">{{ total_clients }}</div>
+      <div class="text-muted small" style="font-size: 11px; letter-spacing: 0.5px;">Clients</div>
+    </div>
+  </div>
+  <div class="col-md-2 col-sm-4">
+    <div class="stat-card">
+      <div class="stat-icon mb-3" style="background: rgba(220, 53, 69, 0.1); color: #dc3545;"><i class="bi bi-person-badge"></i></div>
+      <div class="fs-2 fw-bold" style="color: #dc3545; font-family: 'Outfit', sans-serif;">{{ total_workers }}</div>
+      <div class="text-muted small" style="font-size: 11px; letter-spacing: 0.5px;">Workers</div>
+    </div>
+  </div>
+  <div class="col-md-2 col-sm-4">
+    <div class="stat-card">
+      <div class="stat-icon mb-3" style="background: rgba(108, 117, 125, 0.1); color: #6c757d;"><i class="bi bi-list-task"></i></div>
+      <div class="fs-2 fw-bold" style="color: #6c757d; font-family: 'Outfit', sans-serif;">{{ pending_tasks }}</div>
+      <div class="text-muted small" style="font-size: 11px; letter-spacing: 0.5px;">Pending Tasks</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Recent Projects -->
+  <div class="col-lg-8">
+    <div class="card border-0">
+      <div class="card-header">
+        <span class="fs-5 fw-bold" style="font-family: 'Outfit', sans-serif;"><i class="bi bi-building me-2" style="color: var(--luxury-gold)"></i>Recent Projects</span>
+        <a href="{% url 'admin_project_list' %}" class="btn btn-sm btn-outline-warning">View All</a>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Project</th>
+                <th>Client</th>
+                <th>Type</th>
+                <th>Budget</th>
+                <th>Progress</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in recent_projects %}
+              <tr>
+                <td class="fw-bold" style="color: var(--luxury-primary);">{{ p.name }}</td>
+                <td class="text-muted">{{ p.client.name }}</td>
+                <td><span class="badge" style="background: var(--luxury-gold-light); color: var(--luxury-gold-dark); border: 1px solid var(--luxury-gold-border);">{{ p.get_project_type_display }}</span></td>
+                <td class="fw-semibold text-success">₹{{ p.budget }}</td>
+                <td style="min-width:130px">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="progress w-100"><div class="progress-bar" style="width:{{ p.progress_percent }}%"></div></div>
+                    <small class="fw-bold text-muted" style="font-size: 11px;">{{ p.progress_percent }}%</small>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge 
+                    {% if p.status == 'ongoing' %}bg-success-subtle text-success border border-success-subtle
+                    {% elif p.status == 'completed' %}bg-primary-subtle text-primary border border-primary-subtle
+                    {% elif p.status == 'on_hold' %}bg-warning-subtle text-warning border border-warning-subtle
+                    {% else %}bg-secondary-subtle text-secondary border border-secondary-subtle{% endif %}">
+                    {{ p.get_status_display }}
+                  </span>
+                </td>
+                <td><a href="{% url 'admin_project_detail' p.pk %}" class="btn btn-sm btn-outline-warning px-3 py-1">View</a></td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="7" class="text-center text-muted py-5">No projects found. <a href="{% url 'admin_project_add' %}" class="text-decoration-none text-warning fw-semibold">Add your first project!</a></td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Expenses -->
+  <div class="col-lg-4">
+    <div class="card border-0">
+      <div class="card-header">
+        <span class="fs-5 fw-bold" style="font-family: 'Outfit', sans-serif;"><i class="bi bi-cash-stack me-2" style="color: var(--luxury-gold)"></i>Recent Expenses</span>
+      </div>
+      <div class="card-body p-0">
+        {% for e in recent_expenses %}
+        <div class="d-flex justify-content-between align-items-center px-4 py-3 border-bottom transition-all" style="transition: background 0.3s;" onmouseover="this.style.background='var(--luxury-gold-light)'" onmouseout="this.style.background='transparent'">
+          <div>
+            <div class="fw-bold small" style="color: var(--luxury-primary);">{{ e.title }}</div>
+            <div class="text-muted" style="font-size: 11px;">{{ e.project.name }} · {{ e.date }}</div>
+          </div>
+          <div class="text-danger fw-bold fs-6">₹{{ e.amount }}</div>
+        </div>
+        {% empty %}
+        <div class="text-center text-muted py-5">No recent expenses logged</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

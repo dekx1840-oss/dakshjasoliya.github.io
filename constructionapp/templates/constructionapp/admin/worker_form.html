@@ -1,0 +1,15 @@
+{% extends 'constructionapp/admin/base.html' %}
+{% block content %}
+<div class="page-header"><h1 class="page-title">Add Worker</h1><a href="{% url 'admin_worker_list' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a></div>
+<div class="card p-4" style="max-width:600px">
+  <form method="post" enctype="multipart/form-data">{% csrf_token %}
+    <div class="mb-3"><label class="form-label fw-semibold">Full Name *</label><input name="name" class="form-control" required></div>
+    <div class="mb-3"><label class="form-label fw-semibold">Phone *</label><input name="phone" class="form-control" required></div>
+    <div class="mb-3"><label class="form-label fw-semibold">Role/Skill *</label><input name="role" class="form-control" placeholder="e.g. Mason, Electrician, Plumber" required></div>
+    <div class="mb-3"><label class="form-label fw-semibold">Daily Wage (₹) *</label><input name="daily_wage" type="number" class="form-control" required></div>
+    <div class="mb-3"><label class="form-label fw-semibold">Joining Date *</label><input name="joining_date" type="date" class="form-control" required></div>
+    <div class="mb-4"><label class="form-label fw-semibold">Worker Photo</label><input name="photo" type="file" class="form-control" accept="image/*"></div>
+    <button class="btn btn-warning w-100 py-2">Save Worker</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends 'constructionapp/user/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h2 class="fw-bold mb-1" style="color:#1a2942">👤 My Profile</h2>
+    <p class="text-muted mb-0">Your account details</p>
+  </div>
+  <a href="{% url 'user_dashboard' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to Dashboard</a>
+</div>
+{% if client %}
+<div class="row g-4">
+  <!-- Client Details Card -->
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-person-circle me-2 text-warning"></i>Personal Information</div>
+      <div class="card-body">
+        <table class="table table-borderless mb-0">
+          <tbody>
+            <tr>
+              <td class="text-muted fw-semibold" style="width:140px"><i class="bi bi-person me-2"></i>Full Name</td>
+              <td class="fw-bold">{{ client.name }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted fw-semibold"><i class="bi bi-telephone me-2"></i>Phone</td>
+              <td>{{ client.phone|default:"Not provided" }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted fw-semibold"><i class="bi bi-envelope me-2"></i>Email</td>
+              <td>{{ client.email|default:"Not provided" }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted fw-semibold"><i class="bi bi-geo-alt me-2"></i>Address</td>
+              <td>{{ client.address|default:"Not provided" }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted fw-semibold"><i class="bi bi-calendar-check me-2"></i>Member Since</td>
+              <td>{{ client.created_at|date:"d M Y" }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted fw-semibold"><i class="bi bi-shield-lock me-2"></i>Username</td>
+              <td><code>{{ request.user.username }}</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <!-- Project Summary Card -->
+  <div class="col-md-5">
+    <div class="card mb-3">
+      <div class="card-header"><i class="bi bi-bar-chart me-2 text-warning"></i>Project Summary</div>
+      <div class="card-body text-center">
+        <div class="row g-3">
+          <div class="col-4">
+            <div class="fs-2 fw-bold text-primary">{{ total_projects }}</div>
+            <div class="text-muted small">Total</div>
+          </div>
+          <div class="col-4">
+            <div class="fs-2 fw-bold text-success">{{ ongoing }}</div>
+            <div class="text-muted small">Ongoing</div>
+          </div>
+          <div class="col-4">
+            <div class="fs-2 fw-bold text-info">{{ completed }}</div>
+            <div class="text-muted small">Completed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body text-center py-4">
+        <i class="bi bi-info-circle text-warning display-6 d-block mb-2"></i>
+        <p class="text-muted small mb-0">To update your profile details, please contact your project administrator.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="card p-5 text-center">
+  <i class="bi bi-person-x display-4 text-muted mb-3"></i>
+  <h5>Account Not Linked</h5>
+  <p class="text-muted">Your account is not linked to a client profile. Please contact admin.</p>
+</div>
+{% endif %}
+{% endblock %}

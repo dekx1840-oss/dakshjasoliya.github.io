@@ -1,0 +1,224 @@
+{% extends 'constructionapp/admin/base.html' %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">🏗️ {{ project.name }}</h1>
+  <div>
+    <a href="{% url 'admin_project_edit' project.pk %}" class="btn btn-outline-warning me-2"><i class="bi bi-pencil me-1"></i>Edit</a>
+    <a href="{% url 'admin_project_list' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+  </div>
+</div>
+
+<!-- Architecture Images -->
+{% if project.site_image or project.floor_plan or project.elevation_image %}
+<div class="card mb-4 border-0">
+  <div class="card-header">
+    <span class="fs-5 fw-bold" style="font-family: 'Outfit', sans-serif;"><i class="bi bi-images me-2" style="color: var(--luxury-gold)"></i>Architecture & Site Gallery</span>
+  </div>
+  <div class="card-body p-4">
+    <div class="row g-4">
+      {% if project.site_image %}
+      <div class="col-md-4">
+        <div class="text-muted small mb-2 fw-semibold" style="font-family: 'Outfit', sans-serif; letter-spacing: 1px;">📸 SITE PHOTO</div>
+        <div class="rounded-3" style="overflow: hidden; height:200px; border: 1px solid var(--luxury-border)">
+          <img src="{{ project.site_image.url }}" class="img-fluid transition-all" style="height:100%; width:100%; object-fit:cover; transition: transform 0.5s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        </div>
+      </div>
+      {% endif %}
+      {% if project.floor_plan %}
+      <div class="col-md-4">
+        <div class="text-muted small mb-2 fw-semibold" style="font-family: 'Outfit', sans-serif; letter-spacing: 1px;">📐 FLOOR PLAN</div>
+        <div class="rounded-3" style="overflow: hidden; height:200px; border: 1px solid var(--luxury-border)">
+          <img src="{{ project.floor_plan.url }}" class="img-fluid transition-all" style="height:100%; width:100%; object-fit:cover; transition: transform 0.5s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        </div>
+      </div>
+      {% endif %}
+      {% if project.elevation_image %}
+      <div class="col-md-4">
+        <div class="text-muted small mb-2 fw-semibold" style="font-family: 'Outfit', sans-serif; letter-spacing: 1px;">🏠 ELEVATION DESIGN</div>
+        <div class="rounded-3" style="overflow: hidden; height:200px; border: 1px solid var(--luxury-border)">
+          <img src="{{ project.elevation_image.url }}" class="img-fluid transition-all" style="height:100%; width:100%; object-fit:cover; transition: transform 0.5s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Project Info Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-md-2">
+    <div class="stat-card text-center">
+      <div class="text-muted small mb-1" style="font-size: 11px;">Client</div>
+      <div class="fw-bold" style="color: var(--luxury-primary); font-family: 'Outfit', sans-serif;">{{ project.client.name }}</div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="stat-card text-center">
+      <div class="text-muted small mb-1" style="font-size: 11px;">Type</div>
+      <div class="fw-bold" style="color: var(--luxury-primary); font-family: 'Outfit', sans-serif;">{{ project.get_project_type_display }}</div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="stat-card text-center">
+      <div class="text-muted small mb-1" style="font-size: 11px;">Area</div>
+      <div class="fw-bold" style="color: var(--luxury-primary); font-family: 'Outfit', sans-serif;">{{ project.area_sqft|default:"-" }} sqft</div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="stat-card text-center">
+      <div class="text-muted small mb-1" style="font-size: 11px;">Floors</div>
+      <div class="fw-bold" style="color: var(--luxury-primary); font-family: 'Outfit', sans-serif;">{{ project.floors }}</div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="stat-card text-center">
+      <div class="text-muted small mb-1" style="font-size: 11px;">Budget</div>
+      <div class="fw-bold text-success" style="font-family: 'Outfit', sans-serif;">₹{{ project.budget }}</div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="stat-card text-center">
+      <div class="text-muted small mb-1" style="font-size: 11px;">Remaining</div>
+      <div class="fw-bold {% if budget_remaining < 0 %}text-danger{% else %}text-primary{% endif %}" style="font-family: 'Outfit', sans-serif;">₹{{ budget_remaining }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- Progress -->
+<div class="card mb-5 p-4 border-0">
+  <div class="d-flex justify-content-between mb-2">
+    <span class="fw-bold" style="font-family: 'Outfit', sans-serif; color: var(--luxury-primary);">Overall Progress</span>
+    <span class="fw-bold" style="color: var(--luxury-gold-dark);">{{ progress }}%</span>
+  </div>
+  <div class="progress" style="height:10px">
+    <div class="progress-bar" style="width:{{ progress }}%"></div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Tasks -->
+  <div class="col-lg-6">
+    <div class="card border-0 h-100">
+      <div class="card-header">
+        <span class="fs-5 fw-bold" style="font-family: 'Outfit', sans-serif;"><i class="bi bi-list-check me-2" style="color: var(--luxury-gold)"></i>Tasks</span>
+        <a href="{% url 'admin_task_add' project.pk %}" class="btn btn-sm btn-warning"><i class="bi bi-plus-lg"></i></a>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead><tr><th>Task</th><th>Worker</th><th>Priority</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              {% for t in tasks %}
+              <tr>
+                <td class="fw-bold" style="color: var(--luxury-primary);">
+                  {{ t.title }}
+                  <div class="text-muted" style="font-size:11px; font-weight: normal;">Due: {{ t.deadline }}</div>
+                </td>
+                <td class="text-muted">{{ t.worker.name|default:"—" }}</td>
+                <td>
+                  <span class="badge {% if t.priority == 'high' %}bg-danger-subtle text-danger border border-danger-subtle{% elif t.priority == 'medium' %}bg-warning-subtle text-warning border border-warning-subtle{% else %}bg-secondary-subtle text-secondary border border-secondary-subtle{% endif %}">
+                    {{ t.priority }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge {% if t.status == 'completed' %}bg-success-subtle text-success border border-success-subtle{% elif t.status == 'in_progress' %}bg-primary-subtle text-primary border border-primary-subtle{% else %}bg-secondary-subtle text-secondary border border-secondary-subtle{% endif %}">
+                    {{ t.get_status_display }}
+                  </span>
+                </td>
+                <td><a href="{% url 'admin_task_delete' t.pk %}" class="btn btn-sm btn-outline-danger py-1 px-2" onclick="return confirm('Delete?')"><i class="bi bi-trash"></i></a></td>
+              </tr>
+              {% empty %}<tr><td colspan="5" class="text-center text-muted py-4">No tasks configured</td></tr>{% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Materials -->
+  <div class="col-lg-6">
+    <div class="card border-0 h-100">
+      <div class="card-header">
+        <span class="fs-5 fw-bold" style="font-family: 'Outfit', sans-serif;"><i class="bi bi-box-seam me-2" style="color: var(--luxury-gold)"></i>Materials Inventory</span>
+        <a href="{% url 'admin_material_add' project.pk %}" class="btn btn-sm btn-warning"><i class="bi bi-plus-lg"></i></a>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead><tr><th>Material</th><th>Qty</th><th>Unit Price</th><th>Total</th><th></th></tr></thead>
+            <tbody>
+              {% for m in materials %}
+              <tr class="{% if m.is_low_stock %}table-warning{% endif %}">
+                <td class="fw-bold" style="color: var(--luxury-primary);">
+                  {{ m.name }}
+                  {% if m.is_low_stock %}<span class="badge bg-danger ms-1">Low Stock</span>{% endif %}
+                </td>
+                <td class="text-muted">{{ m.quantity }} {{ m.unit }}</td>
+                <td class="text-muted">₹{{ m.unit_price }}</td>
+                <td class="text-success fw-bold">₹{{ m.total_cost }}</td>
+                <td><a href="{% url 'admin_material_delete' m.pk %}" class="btn btn-sm btn-outline-danger py-1 px-2" onclick="return confirm('Delete?')"><i class="bi bi-trash"></i></a></td>
+              </tr>
+              {% empty %}<tr><td colspan="5" class="text-center text-muted py-4">No materials logged</td></tr>{% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expenses -->
+  <div class="col-lg-6">
+    <div class="card border-0 h-100">
+      <div class="card-header">
+        <span class="fs-5 fw-bold" style="font-family: 'Outfit', sans-serif;"><i class="bi bi-cash-stack me-2" style="color: var(--luxury-gold)"></i>Expenses Ledger (₹{{ total_expense }})</span>
+        <a href="{% url 'admin_expense_add' project.pk %}" class="btn btn-sm btn-warning"><i class="bi bi-plus-lg"></i></a>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead><tr><th>Title</th><th>Amount</th><th>Category</th><th>Date</th><th></th></tr></thead>
+            <tbody>
+              {% for e in expenses %}
+              <tr>
+                <td class="fw-bold" style="color: var(--luxury-primary);">{{ e.title }}</td>
+                <td class="text-danger fw-bold">₹{{ e.amount }}</td>
+                <td><span class="badge bg-info-subtle text-info border border-info-subtle">{{ e.category }}</span></td>
+                <td class="text-muted">{{ e.date }}</td>
+                <td><a href="{% url 'admin_expense_delete' e.pk %}" class="btn btn-sm btn-outline-danger py-1 px-2" onclick="return confirm('Delete?')"><i class="bi bi-trash"></i></a></td>
+              </tr>
+              {% empty %}<tr><td colspan="5" class="text-center text-muted py-4">No expenses recorded</td></tr>{% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Updates -->
+  <div class="col-lg-6">
+    <div class="card border-0 h-100">
+      <div class="card-header">
+        <span class="fs-5 fw-bold" style="font-family: 'Outfit', sans-serif;"><i class="bi bi-megaphone me-2" style="color: var(--luxury-gold)"></i>Project Updates</span>
+        <a href="{% url 'admin_update_add' project.pk %}" class="btn btn-sm btn-warning"><i class="bi bi-plus-lg"></i></a>
+      </div>
+      <div class="card-body p-0">
+        {% for u in updates %}
+        <div class="p-4 border-bottom transition-all" style="transition: background 0.3s;" onmouseover="this.style.background='var(--luxury-gold-light)'" onmouseout="this.style.background='transparent'">
+          <div class="d-flex gap-3">
+            {% if u.image %}
+              <img src="{{ u.image.url }}" style="width:64px;height:64px;object-fit:cover;border-radius:12px; border: 1px solid var(--luxury-border);">
+            {% endif %}
+            <div>
+              <div class="fw-bold" style="color: var(--luxury-primary);">{{ u.title }}</div>
+              <div class="text-muted small mb-1">{{ u.description }}</div>
+              <div class="text-muted" style="font-size:10px;"><i class="bi bi-clock me-1"></i>{{ u.created_at|date:"d M Y" }}</div>
+            </div>
+          </div>
+        </div>
+        {% empty %}<div class="text-center text-muted py-5">No progress updates posted yet</div>{% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

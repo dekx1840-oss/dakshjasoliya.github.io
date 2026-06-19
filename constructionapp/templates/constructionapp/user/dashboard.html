@@ -1,0 +1,90 @@
+{% extends 'constructionapp/user/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-5">
+  <div>
+    <h2 class="fw-bold mb-1" style="color: var(--luxury-primary); font-family: 'Cinzel', serif; letter-spacing: 0.5px;">Welcome, {{ client.name|default:request.user.username }}!</h2>
+    <p class="text-muted mb-0" style="font-family: 'Outfit', sans-serif;">Here is a comprehensive view of your ongoing and completed projects</p>
+  </div>
+</div>
+
+{% if client %}
+<!-- Stats -->
+<div class="row g-3 mb-5">
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="text-muted small mb-1" style="font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">Total Projects</div>
+      <div class="fs-1 fw-bold" style="color: var(--luxury-primary); font-family: 'Outfit', sans-serif;">{{ total_projects }}</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="text-muted small mb-1" style="font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">Ongoing Projects</div>
+      <div class="fs-1 fw-bold" style="color: #28a745; font-family: 'Outfit', sans-serif;">{{ ongoing }}</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="text-muted small mb-1" style="font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">Completed Projects</div>
+      <div class="fs-1 fw-bold" style="color: #17a2b8; font-family: 'Outfit', sans-serif;">{{ completed }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- Projects -->
+<div class="row g-4">
+  {% for p in projects %}
+  <div class="col-md-6">
+    <div class="card h-100 border-0">
+      {% if p.site_image %}
+        <div style="overflow: hidden; height: 200px;">
+          <img src="{{ p.site_image.url }}" class="card-img-top transition-all" style="height:100%; width:100%; object-fit:cover; transition: transform 0.5s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+        </div>
+      {% else %}
+        <div style="height:140px; background: linear-gradient(135deg, var(--luxury-primary), var(--luxury-secondary)); display:flex; align-items:center; justify-content:center;">
+          <i class="bi bi-building text-white" style="font-size:40px; opacity:0.35"></i>
+        </div>
+      {% endif %}
+      <div class="card-body p-4 d-flex flex-column">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <h5 class="fw-bold mb-0" style="color: var(--luxury-primary); font-family: 'Outfit', sans-serif;">{{ p.name }}</h5>
+          <span class="badge 
+            {% if p.status == 'ongoing' %}bg-success-subtle text-success border border-success-subtle
+            {% elif p.status == 'completed' %}bg-primary-subtle text-primary border border-primary-subtle
+            {% else %}bg-secondary-subtle text-secondary border border-secondary-subtle{% endif %}">
+            {{ p.get_status_display }}
+          </span>
+        </div>
+        <p class="text-muted small mb-2"><i class="bi bi-geo-alt me-1" style="color: var(--luxury-gold)"></i>{{ p.location }}</p>
+        <p class="text-muted small mb-4" style="font-size: 12px;">
+          <i class="bi bi-building me-1"></i>{{ p.get_project_type_display }} &nbsp;·&nbsp; <i class="bi bi-calendar me-1"></i>Started {{ p.start_date }}
+        </p>
+        <div class="mt-auto">
+          <div class="d-flex justify-content-between mb-2">
+            <small class="text-muted" style="font-family: 'Outfit', sans-serif;">Progress</small>
+            <small class="fw-bold text-muted" style="font-family: 'Outfit', sans-serif;">{{ p.progress_percent }}%</small>
+          </div>
+          <div class="progress mb-4"><div class="progress-bar" style="width:{{ p.progress_percent }}%"></div></div>
+          <a href="{% url 'user_project_detail' p.pk %}" class="btn btn-warning w-100 py-2"><i class="bi bi-eye me-2"></i>View Project Details</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <div class="card p-5 text-center border-0">
+      <i class="bi bi-building display-4 text-muted mb-3" style="color: var(--luxury-gold)"></i>
+      <h5 class="fw-bold" style="color: var(--luxury-primary);">No Projects Assigned Yet</h5>
+      <p class="text-muted small">Contact your management team or project manager to get started.</p>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="card p-5 text-center border-0">
+  <i class="bi bi-person-x display-4 text-muted mb-3" style="color: var(--luxury-gold)"></i>
+  <h5 class="fw-bold" style="color: var(--luxury-primary);">Account Not Linked</h5>
+  <p class="text-muted">Your account is not linked to a client profile. Please contact the administrator.</p>
+</div>
+{% endif %}
+{% endblock %}

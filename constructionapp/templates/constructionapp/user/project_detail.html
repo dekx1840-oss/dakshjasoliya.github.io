@@ -1,0 +1,232 @@
+{% extends 'constructionapp/user/base.html' %}
+{% block content %}
+
+{% if xss_msg %}
+<!-- [VULN - XSS #2] Reflected XSS: msg param rendered unescaped -->
+<div class="alert alert-info">{{ xss_msg }}</div>
+{% endif %}
+
+<div class="d-flex justify-content-between align-items-center mb-5">
+  <h2 class="fw-bold mb-0" style="color: var(--luxury-primary); font-family: 'Cinzel', serif; letter-spacing: 0.5px;">🏗️ {{ project.name }}</h2>
+  <a href="{% url 'user_dashboard' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to Portal</a>
+</div>
+
+<!-- Architecture Images -->
+{% if project.site_image or project.floor_plan or project.elevation_image %}
+<div class="card mb-4 border-0">
+  <div class="card-header">
+    <span class="fs-5 fw-bold" style="font-family: 'Outfit', sans-serif;"><i class="bi bi-images me-2" style="color: var(--luxury-gold)"></i>Project Gallery & Architectural Designs</span>
+  </div>
+  <div class="card-body p-4">
+    <div class="row g-4">
+      {% if project.site_image %}
+      <div class="col-md-4">
+        <div class="text-muted small mb-2 fw-semibold" style="font-family: 'Outfit', sans-serif; letter-spacing: 1px;">📸 SITE PHOTO</div>
+        <div class="rounded-3" style="overflow: hidden; height:200px; border: 1px solid var(--luxury-border); cursor: pointer;" onclick="window.open(this.querySelector('img').src)">
+          <img src="{{ project.site_image.url }}" class="img-fluid transition-all" style="height:100%; width:100%; object-fit:cover; transition: transform 0.5s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        </div>
+      </div>
+      {% endif %}
+      {% if project.floor_plan %}
+      <div class="col-md-4">
+        <div class="text-muted small mb-2 fw-semibold" style="font-family: 'Outfit', sans-serif; letter-spacing: 1px;">📐 FLOOR PLAN</div>
+        <div class="rounded-3" style="overflow: hidden; height:200px; border: 1px solid var(--luxury-border); cursor: pointer;" onclick="window.open(this.querySelector('img').src)">
+          <img src="{{ project.floor_plan.url }}" class="img-fluid transition-all" style="height:100%; width:100%; object-fit:cover; transition: transform 0.5s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        </div>
+      </div>
+      {% endif %}
+      {% if project.elevation_image %}
+      <div class="col-md-4">
+        <div class="text-muted small mb-2 fw-semibold" style="font-family: 'Outfit', sans-serif; letter-spacing: 1px;">🏠 ELEVATION DESIGN</div>
+        <div class="rounded-3" style="overflow: hidden; height:200px; border: 1px solid var(--luxury-border); cursor: pointer;" onclick="window.open(this.querySelector('img').src)">
+          <img src="{{ project.elevation_image.url }}" class="img-fluid transition-all" style="height:100%; width:100%; object-fit:cover; transition: transform 0.5s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    <p class="text-muted small mt-3 mb-0" style="font-size: 11px;"><i class="bi bi-info-circle-fill me-1"></i>Click on any drawing to view in full screen mode</p>
+  </div>
+</div>
+{% endif %}
+
+<!-- Project Metrics -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="stat-card text-center">
+      <div class="text-muted small mb-1" style="font-size: 11px;">Type</div>
+      <div class="fw-bold" style="color: var(--luxury-primary); font-family: 'Outfit', sans-serif;">{{ project.get_project_type_display }}</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card text-center">
+      <div class="text-muted small mb-1" style="font-size: 11px;">Location</div>
+      <div class="fw-bold" style="color: var(--luxury-primary); font-family: 'Outfit', sans-serif;">{{ project.location }}</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card text-center">
+      <div class="text-muted small mb-1" style="font-size: 11px;">Area</div>
+      <div class="fw-bold" style="color: var(--luxury-primary); font-family: 'Outfit', sans-serif;">{{ project.area_sqft|default:"-" }} sqft</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card text-center">
+      <div class="text-muted small mb-1" style="font-size: 11px;">Floors</div>
+      <div class="fw-bold" style="color: var(--luxury-primary); font-family: 'Outfit', sans-serif;">{{ project.floors }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- Financial Summary -->
+<div class="card mb-4 border-0">
+  <div class="card-body p-4">
+    <div class="row text-center g-3">
+      <div class="col-md-4">
+        <div class="text-muted small mb-1" style="font-size:11px;">Total Contract Value</div>
+        <div class="fs-4 fw-bold text-success" style="font-family: 'Outfit', sans-serif;">₹{{ project.budget }}</div>
+      </div>
+      <div class="col-md-4">
+        <div class="text-muted small mb-1" style="font-size:11px;">Amount Spent to Date</div>
+        <div class="fs-4 fw-bold text-danger" style="font-family: 'Outfit', sans-serif;">₹{{ total_expense }}</div>
+      </div>
+      <div class="col-md-4">
+        <div class="text-muted small mb-1" style="font-size:11px;">Remaining Funds</div>
+        <div class="fs-4 fw-bold {% if budget_remaining < 0 %}text-danger{% else %}text-primary{% endif %}" style="font-family: 'Outfit', sans-serif;">₹{{ budget_remaining }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Progress -->
+<div class="card mb-5 p-4 border-0">
+  <div class="d-flex justify-content-between mb-2">
+    <span class="fw-bold" style="font-family: 'Outfit', sans-serif; color: var(--luxury-primary);">Overall Completion Progress</span>
+    <span class="fw-bold" style="color: var(--luxury-gold-dark);">{{ progress }}%</span>
+  </div>
+  <div class="progress" style="height:10px">
+    <div class="progress-bar" style="width:{{ progress }}%"></div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Tasks -->
+  <div class="col-lg-6">
+    <div class="card border-0 h-100">
+      <div class="card-header">
+        <span class="fs-5 fw-bold" style="font-family: 'Outfit', sans-serif;"><i class="bi bi-list-check me-2" style="color: var(--luxury-gold)"></i>Tasks & Operations</span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead><tr><th>Task</th><th>Worker</th><th>Deadline</th><th>Priority</th><th>Status</th></tr></thead>
+            <tbody>
+              {% for t in tasks %}
+              <tr>
+                <td class="fw-bold" style="color: var(--luxury-primary);">{{ t.title }}</td>
+                <td class="text-muted">{{ t.worker.name|default:"—" }}</td>
+                <td class="text-muted">{{ t.deadline }}</td>
+                <td>
+                  <span class="badge {% if t.priority == 'high' %}bg-danger-subtle text-danger border border-danger-subtle{% elif t.priority == 'medium' %}bg-warning-subtle text-warning border border-warning-subtle{% else %}bg-secondary-subtle text-secondary border border-secondary-subtle{% endif %}">
+                    {{ t.priority }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge {% if t.status == 'completed' %}bg-success-subtle text-success border border-success-subtle{% elif t.status == 'in_progress' %}bg-primary-subtle text-primary border border-primary-subtle{% else %}bg-secondary-subtle text-secondary border border-secondary-subtle{% endif %}">
+                    {{ t.get_status_display }}
+                  </span>
+                </td>
+              </tr>
+              {% empty %}<tr><td colspan="5" class="text-center text-muted py-4">No tasks found</td></tr>{% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Materials -->
+  <div class="col-lg-6">
+    <div class="card border-0 h-100">
+      <div class="card-header">
+        <span class="fs-5 fw-bold" style="font-family: 'Outfit', sans-serif;"><i class="bi bi-box-seam me-2" style="color: var(--luxury-gold)"></i>Materials Allocated</span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead><tr><th>Material</th><th>Quantity</th><th>Unit Price</th><th>Total Cost</th></tr></thead>
+            <tbody>
+              {% for m in materials %}
+              <tr class="{% if m.is_low_stock %}table-warning{% endif %}">
+                <td class="fw-bold" style="color: var(--luxury-primary);">
+                  {{ m.name }}
+                  {% if m.is_low_stock %}<span class="badge bg-danger ms-1">Low Stock</span>{% endif %}
+                </td>
+                <td class="text-muted">{{ m.quantity }} {{ m.unit }}</td>
+                <td class="text-muted">₹{{ m.unit_price }}</td>
+                <td class="text-success fw-bold">₹{{ m.total_cost }}</td>
+              </tr>
+              {% empty %}<tr><td colspan="4" class="text-center text-muted py-4">No materials recorded</td></tr>{% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expenses -->
+  <div class="col-lg-6">
+    <div class="card border-0 h-100">
+      <div class="card-header">
+        <span class="fs-5 fw-bold" style="font-family: 'Outfit', sans-serif;"><i class="bi bi-cash-stack me-2" style="color: var(--luxury-gold)"></i>Expenses Breakdown (₹{{ total_expense }})</span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead><tr><th>Title</th><th>Amount</th><th>Category</th><th>Date</th><th>Note</th></tr></thead>
+            <tbody>
+              {% for e in expenses %}
+              <tr>
+                <td class="fw-bold" style="color: var(--luxury-primary);">{{ e.title }}</td>
+                <td class="text-danger fw-bold">₹{{ e.amount }}</td>
+                <td><span class="badge bg-info-subtle text-info border border-info-subtle">{{ e.get_category_display }}</span></td>
+                <td class="text-muted">{{ e.date }}</td>
+                <td class="text-muted small">{{ e.note|default:"—" }}</td>
+              </tr>
+              {% empty %}<tr><td colspan="5" class="text-center text-muted py-4">No expenses recorded</td></tr>{% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Construction Updates -->
+  <div class="col-lg-6">
+    <div class="card border-0 h-100">
+      <div class="card-header">
+        <span class="fs-5 fw-bold" style="font-family: 'Outfit', sans-serif;"><i class="bi bi-megaphone me-2" style="color: var(--luxury-gold)"></i>Construction Status Updates</span>
+      </div>
+      <div class="card-body">
+        {% for u in updates %}
+        <div class="d-flex gap-3 mb-4 pb-4 border-bottom transition-all" style="transition: background 0.3s;" onmouseover="this.style.background='var(--luxury-gold-light)'" onmouseout="this.style.background='transparent'">
+          {% if u.image %}
+            <img src="{{ u.image.url }}" style="width:100px;height:80px;object-fit:cover;border-radius:12px;border: 1px solid var(--luxury-border);flex-shrink:0;">
+          {% endif %}
+          <div>
+            <div class="fw-bold" style="color: var(--luxury-primary);">{{ u.title }}</div>
+            <div class="text-muted small mb-1">{{ u.description }}</div>
+            <div class="text-muted" style="font-size:10px;"><i class="bi bi-calendar me-1"></i>{{ u.created_at|date:"d M Y, H:i" }}</div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="text-center text-muted py-5">
+          <i class="bi bi-megaphone display-5 d-block mb-3" style="color: var(--luxury-gold)"></i>
+          <h6 class="fw-bold">No Updates Posted Yet</h6>
+          <p class="text-muted small mb-0">Check back later for construction updates.</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

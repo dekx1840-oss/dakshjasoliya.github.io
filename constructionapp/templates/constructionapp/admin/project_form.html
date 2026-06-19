@@ -1,0 +1,122 @@
+{% extends 'constructionapp/admin/base.html' %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">{{ action }} Project</h1>
+  <a href="{% url 'admin_project_list' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+</div>
+<form method="post" enctype="multipart/form-data">{% csrf_token %}
+<div class="row g-3">
+  <!-- Left Column -->
+  <div class="col-lg-8">
+    <div class="card p-4 mb-3">
+      <h6 class="fw-bold mb-3 text-muted">📋 PROJECT INFORMATION</h6>
+      <div class="row g-3">
+        <div class="col-md-8">
+          <label class="form-label fw-semibold">Project Name *</label>
+          <input name="name" class="form-control" value="{{ project.name|default:'' }}" placeholder="e.g. Patel Residence" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Project Type *</label>
+          <select name="project_type" class="form-select" required>
+            <option value="">-- Select --</option>
+            <option value="residential" {% if project.project_type == 'residential' %}selected{% endif %}>🏠 Residential House</option>
+            <option value="commercial" {% if project.project_type == 'commercial' %}selected{% endif %}>🏢 Commercial Office</option>
+            <option value="apartment" {% if project.project_type == 'apartment' %}selected{% endif %}>🏘️ Apartment</option>
+            <option value="villa" {% if project.project_type == 'villa' %}selected{% endif %}>🏡 Villa</option>
+            <option value="renovation" {% if project.project_type == 'renovation' %}selected{% endif %}>🔨 Renovation</option>
+            <option value="other" {% if project.project_type == 'other' %}selected{% endif %}>Other</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Client *</label>
+          <select name="client" class="form-select" required>
+            <option value="">-- Select Client --</option>
+            {% for c in clients %}
+              <option value="{{ c.pk }}" {% if project.client.pk == c.pk %}selected{% endif %}>{{ c.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Location *</label>
+          <input name="location" class="form-control" value="{{ project.location|default:'' }}" placeholder="e.g. Satellite, Ahmedabad" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Area (sq.ft)</label>
+          <input name="area_sqft" type="number" class="form-control" value="{{ project.area_sqft|default:'' }}" placeholder="e.g. 1200">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">No. of Floors</label>
+          <input name="floors" type="number" class="form-control" value="{{ project.floors|default:1 }}" min="1">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Budget (₹) *</label>
+          <input name="budget" type="number" step="0.01" class="form-control" value="{{ project.budget|default:'' }}" placeholder="500000" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Start Date *</label>
+          <input name="start_date" type="date" class="form-control" value="{{ project.start_date|default:'' }}" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">End Date</label>
+          <input name="end_date" type="date" class="form-control" value="{{ project.end_date|default:'' }}">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Status</label>
+          <select name="status" class="form-select">
+            <option value="planning" {% if project.status == 'planning' %}selected{% endif %}>Planning</option>
+            <option value="ongoing" {% if project.status == 'ongoing' %}selected{% endif %}>Ongoing</option>
+            <option value="completed" {% if project.status == 'completed' %}selected{% endif %}>Completed</option>
+            <option value="on_hold" {% if project.status == 'on_hold' %}selected{% endif %}>On Hold</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-semibold">Description</label>
+          <textarea name="description" class="form-control" rows="3" placeholder="Project details...">{{ project.description|default:'' }}</textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Architecture Plans -->
+  <div class="col-lg-4">
+    <div class="card p-4 mb-3">
+      <h6 class="fw-bold mb-3 text-muted">🏗️ ARCHITECTURE PLAN IMAGES</h6>
+
+      <!-- Site Image -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold">📸 Site Photo</label>
+        {% if project.site_image %}
+          <img src="{{ project.site_image.url }}" class="img-fluid rounded mb-2" style="max-height:120px;object-fit:cover;width:100%">
+        {% endif %}
+        <input name="site_image" type="file" class="form-control form-control-sm" accept="image/*">
+        <div class="form-text">Photo of the construction site</div>
+      </div>
+
+      <!-- Floor Plan -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold">📐 Floor Plan</label>
+        {% if project.floor_plan %}
+          <img src="{{ project.floor_plan.url }}" class="img-fluid rounded mb-2" style="max-height:120px;object-fit:cover;width:100%">
+        {% endif %}
+        <input name="floor_plan" type="file" class="form-control form-control-sm" accept="image/*">
+        <div class="form-text">Architecture floor plan drawing</div>
+      </div>
+
+      <!-- Elevation -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold">🏠 Elevation Design</label>
+        {% if project.elevation_image %}
+          <img src="{{ project.elevation_image.url }}" class="img-fluid rounded mb-2" style="max-height:120px;object-fit:cover;width:100%">
+        {% endif %}
+        <input name="elevation_image" type="file" class="form-control form-control-sm" accept="image/*">
+        <div class="form-text">Front/side elevation drawing</div>
+      </div>
+    </div>
+
+    <button class="btn btn-warning w-100 py-3 fw-bold">
+      <i class="bi bi-check-lg me-2"></i>Save Project
+    </button>
+  </div>
+</div>
+</form>
+{% endblock %}
